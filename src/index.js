@@ -1,4 +1,4 @@
-import "./styles.css";
+import "./index.css";
 
 
 const searchForm = document.querySelector("#search-form")
@@ -25,11 +25,11 @@ function urlUpdater() {
 searchForm.addEventListener("submit", function (event) {
     event.preventDefault()
     params.set("query", `${searchInput.value}`)
-    searchFormFunction()
+    handleSearch()
 
 })
 
-async function searchFormFunction() {
+async function handleSearch() {
     const movieData = await getMovieData()
     const configurationDetails = await getConfigurationDetails()
 
@@ -48,7 +48,7 @@ async function getConfigurationDetails() {
 
 function renderMovies(data, details) {
 
-    console.log(data)
+       console.log(data)
     // console.log(details)
 
     data.results.forEach((array) => {
@@ -64,8 +64,9 @@ function renderMovies(data, details) {
         // image 
         movieImageElement.src = details.images.secure_base_url + "w185" + array.poster_path
 
-        // id
+        // id + class
         movieContainer.setAttribute("id", array.id)
+        movieContainer.classList.add("movie-container")
 
         // title
         if (array.media_type === "tv") {
@@ -76,18 +77,28 @@ function renderMovies(data, details) {
             movieTitleElement.textContent = array.title;
         }
 
-        console.log(movieContainer)
-
         movieContainer.append(movieTitleElement);
         movieContainer.append(movieImageElement)
 
         movieResults.append(movieContainer);
     });
-
     return;
 }
 
-// GETTING MOVIE DETAILS
+
+// REDIRECTING TO DETAILS.HTML WITH CLICKED MOVIE
+
+movieResults.addEventListener("click", (event) => {
+    let movieContainer = event.target.closest(".movie-container")
+
+    if (movieContainer) {
+        window.location.href = `details.html?id=${movieContainer.id}`
+
+    }
+})    
+
+
+
 
 
 

@@ -3,17 +3,25 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 
 export default {
     mode: "development",
-    entry: "./src/index.js",
-    devtool: "eval-source-map",
+    entry: {
+        index: "./src/index.js",
+        details: "./src/details.js",
+    }, devtool: "eval-source-map",
     output: {
-        filename: "main.js",
+        filename: "[name].js",
         path: path.resolve(import.meta.dirname, "dist"),
         clean: true,
     },
 
     plugins: [
         new HtmlWebpackPlugin({
-            template: "./src/template.html",
+            template: "./src/index.html",
+            chunks: ["index"],
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/details.html",
+            filename: "details.html",
+            chunks: ["details"],
         }),
     ],
 
@@ -26,6 +34,7 @@ export default {
         ],
     },
     devServer: {
-        watchFiles: ["./src/template.html"],
+        watchFiles:
+            ["./src/index.html", "./src/details.html"]
     },
 };
