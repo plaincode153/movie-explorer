@@ -7,6 +7,7 @@ export default {
         index: "./src/index.js",
         details: "./src/details.js",
     }, devtool: "eval-source-map",
+    
     output: {
         filename: "[name].js",
         path: path.resolve(import.meta.dirname, "dist"),

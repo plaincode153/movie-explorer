@@ -1,4 +1,4 @@
-import "./index.css";
+import "./details.css";
 
 const params = new URLSearchParams(window.location.search)
 let movieId = params.get("id")
@@ -8,14 +8,27 @@ async function getMovieDetails() {
     return await response.json()
 }
 
+    import { getConfigDetails } from "./configurationAPIS.js";
+
 async function handleMovie() {
-    let movieData = await getMovieDetails()
-    render(movieData)
+    const movieData = await getMovieDetails()
+    const configDetails = await getConfigDetails()
+    
+    render(movieData, configDetails)
 
 }
 
-function render(movieData) {
-    console.log(movieData)
+const body = document.querySelector("body")
+
+function render(data, config) {
+    let baseUrl = config.images.secure_base_url;
+    let image = data.backdrop_path;
+
+    console.log(config)
+
+    body.style.backgroundImage = `url(${baseUrl}original${image})`
+    
+    
 }
 
 handleMovie()

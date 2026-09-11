@@ -31,7 +31,7 @@ searchForm.addEventListener("submit", function (event) {
 
 async function handleSearch() {
     const movieData = await getMovieData()
-    const configurationDetails = await getConfigurationDetails()
+    const configurationDetails = await getConfigDetails()
 
     renderMovies(movieData, configurationDetails)
 }
@@ -41,10 +41,9 @@ async function getMovieData() {
     return await response.json()
 }
 
-async function getConfigurationDetails() {
-    const response = await fetch(`https://api.themoviedb.org/3/configuration?api_key=1442bd967a8ebd3b37723f20d9f1d1ec`)
-    return await response.json()
-}
+// cofig imports
+import { getConfigDetails } from "./configurationAPIS.js";
+
 
 function renderMovies(data, details) {
 
