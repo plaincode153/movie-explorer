@@ -91,7 +91,6 @@ movieResults.addEventListener("click", (event) => {
 
     if (movieContainer) {
 
-        // seperating media type
         if (movieContainer.classList.contains("tv")) {
             window.location.href = `details.html?id=${movieContainer.id}&type=tv`
         }
