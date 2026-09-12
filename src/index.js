@@ -42,13 +42,10 @@ async function getMovieData() {
 }
 
 // cofig imports
-import { getConfigDetails } from "./configurationAPIS.js";
+import { getConfigDetails } from "./tmdbAPI.js";
 
 
 function renderMovies(data, details) {
-
-       console.log(data)
-    // console.log(details)
 
     data.results.forEach((array) => {
 
@@ -67,13 +64,15 @@ function renderMovies(data, details) {
         movieContainer.setAttribute("id", array.id)
         movieContainer.classList.add("movie-container")
 
-        // title
+        // title + TV/MOVIE class
         if (array.media_type === "tv") {
             movieTitleElement.textContent = array.name;
+            movieContainer.classList.add("tv")
         }
 
         if (array.media_type === "movie") {
             movieTitleElement.textContent = array.title;
+            movieContainer.classList.add("movie")
         }
 
         movieContainer.append(movieTitleElement);
@@ -91,10 +90,17 @@ movieResults.addEventListener("click", (event) => {
     let movieContainer = event.target.closest(".movie-container")
 
     if (movieContainer) {
-        window.location.href = `details.html?id=${movieContainer.id}`
 
+        // seperating media type
+        if (movieContainer.classList.contains("tv")) {
+            window.location.href = `details.html?id=${movieContainer.id}&type=tv`
+        }
+
+        if (movieContainer.classList.contains("movie")) {
+            window.location.href = `details.html?id=${movieContainer.id}&type=movie`
+        }
     }
-})    
+})
 
 
 
