@@ -11,6 +11,7 @@ const voteAverageElement = document.querySelector(".vote-average")
 const voteCountElement = document.querySelector(".vote-count")
 const castMemberElement = document.querySelector(".cast-member")
 const movieInfoElement = document.querySelector(".movie-info")
+const trailerElement = document.querySelector(".trailer")
 
 
 const params = new URLSearchParams(window.location.search)
@@ -18,7 +19,7 @@ let mediaID = params.get("id")
 let mediaType = params.get("type")
 
 
-import { getConfigDetails, getMovieTrailers, getTVTrailers, getMediaDetails, getCredits, getCastImages} from "./tmdbAPI.js";
+import { getConfigDetails, getMovieTrailers, getTVTrailers, getMediaDetails, getCredits, getCastImages } from "./tmdbAPI.js";
 
 async function render() {
     const data = await getMediaDetails(mediaID, mediaType)
@@ -52,7 +53,11 @@ async function render() {
     voteCountElement.textContent = voteCount
 
     // cast
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < credits.cast.length; i++) {
+
+        if (i === 10) {
+            break
+        }
 
         let castName = credits.cast[i].name
 
@@ -87,8 +92,8 @@ async function render() {
         seasonsElement.textContent = seasons + " Seasons • " + episodes + " Episodess"
         movieInfoElement.append(seasonsElement)
 
-        const trailer = getTVTrailers(mediaID)
-
+        const trailer = await getTVTrailers(mediaID)
+        trailerElement.src = "https://www.youtube-nocookie.com/embed/" + trailer.results[trailer.results.length - 1].key
     }
 
     if (mediaType === "movie") {
@@ -103,11 +108,8 @@ async function render() {
 
         const trailer = await getMovieTrailers(mediaID)
         console.log(trailer)
-
+        trailerElement.src = "https://www.youtube-nocookie.com/embed/" + trailer.results[trailer.results.length - 1].key
     }
-
-
-
 
 }
 
