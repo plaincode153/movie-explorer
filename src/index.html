@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,25 +8,60 @@
 </head>
 
 <body>
-    <header>
-        <h1>Movie Search</h1>
+    <header class="site-header">
+        <h1>Movie Explorer</h1>
+
+        <p>
+            Search for movies and TV shows, or browse what's trending.
+        </p>
     </header>
 
     <main>
-        <form id="search-form">
-            <label for="search-input">Search for Movies and TV</label>
-            <input
-                type="text"
-                id="search-input"
-                placeholder="Enter a movie title"
-                required
-            >
-            <button type="submit">Search</button>
-        </form>
+        <section class="search-section">
+            <form id="search-form">
+                <label for="search-input">
+                    Search for Movies and TV
+                </label>
 
-        <p id="message"></p>
+                <div class="search-bar">
+                    <input
+                        type="text"
+                        id="search-input"
+                        placeholder="Enter a movie or TV show"
+                        required
+                    >
 
-        <section id="movie-results"></section>
+                    <button type="submit">
+                        Search
+                    </button>
+                </div>
+            </form>
+
+            <p id="message"></p>
+
+            <section id="movie-results">
+                
+            </section>
+        </section>
+
+        <section class="trending-section">
+            <div class="section-heading">
+                <h2>Trending Movies</h2>
+            </div>
+
+            <div id="trending-movies" class="media-grid">
+            </div>
+        </section>
+
+        <section class="trending-section">
+            <div class="section-heading">
+                <h2>Trending TV</h2>
+            </div>
+
+            <div id="trending-tv" class="media-grid">
+            </div>
+        </section>
     </main>
 </body>
+
 </html>

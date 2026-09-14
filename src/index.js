@@ -1,10 +1,12 @@
 import "./index.css";
+import { getConfigDetails, getTrendingMovies, getTrendingTV, getSearchResults } from "./tmdbAPI.js";
 
-
-const searchForm = document.querySelector("#search-form")
-const searchInput = document.querySelector("#search-input")
-const movieResults = document.querySelector("#movie-results")
-
+const body = document.querySelector("body")
+const searchFormElement = document.querySelector("#search-form")
+const searchInputElement = document.querySelector("#search-input")
+const movieResultsElement = document.querySelector("#movie-results")
+const trendingTVElement = document.querySelector("#trending-tv")
+const trendingMoviesElement = document.querySelector("#trending-movies")
 
 // SEARCH
 
@@ -18,34 +20,24 @@ const params = new URLSearchParams({
     page: 1,
 })
 
-function urlUpdater() {
-    return `${baseUrl}?${params}`
-}
-
-searchForm.addEventListener("submit", function (event) {
+searchFormElement.addEventListener("submit", function (event) {
     event.preventDefault()
-    params.set("query", `${searchInput.value}`)
+    params.set("query", `${searchInputElement.value}`)
     handleSearch()
-
 })
 
 async function handleSearch() {
-    const movieData = await getMovieData()
-    const configurationDetails = await getConfigDetails()
-
-    renderMovies(movieData, configurationDetails)
+    const searchResults = await getSearchResults(`${baseUrl}?${params}`)
+    let cardsArray = await getCards(searchResults)
+    movieResultsElement.append(...cardsArray)
 }
 
-async function getMovieData() {
-    const response = await fetch(urlUpdater())
-    return await response.json()
-}
+// GET CARDS ARRAY & RENDER IN EVENT LISTENER
 
-// cofig imports
-import { getConfigDetails } from "./tmdbAPI.js";
+async function getCards(data) {
 
-
-function renderMovies(data, details) {
+    const config = await getConfigDetails()
+    let cards = []
 
     data.results.forEach((array) => {
 
@@ -53,50 +45,67 @@ function renderMovies(data, details) {
             return;
         }
 
-        let movieContainer = document.createElement("div")
+        let movieCardElement = document.createElement("div")
         let movieTitleElement = document.createElement("p");
         let movieImageElement = document.createElement("img")
 
         // image 
-        movieImageElement.src = details.images.secure_base_url + "w185" + array.poster_path
+        movieImageElement.src = config.images.secure_base_url + "w185" + array.poster_path
 
         // id + class
-        movieContainer.setAttribute("id", array.id)
-        movieContainer.classList.add("movie-container")
+        movieCardElement.setAttribute("id", array.id)
+        movieCardElement.classList.add("movie-card")
 
         // title + TV/MOVIE class
         if (array.media_type === "tv") {
             movieTitleElement.textContent = array.name;
-            movieContainer.classList.add("tv")
+            movieCardElement.classList.add("tv")
         }
 
         if (array.media_type === "movie") {
             movieTitleElement.textContent = array.title;
-            movieContainer.classList.add("movie")
+            movieCardElement.classList.add("movie")
         }
 
-        movieContainer.append(movieTitleElement);
-        movieContainer.append(movieImageElement)
+        movieCardElement.append(movieTitleElement);
+        movieCardElement.append(movieImageElement)
 
-        movieResults.append(movieContainer);
+        cards.push(movieCardElement)
+
+        return;
     });
-    return;
+    return cards;
 }
+
+// TRENDING
+
+async function trending() {
+    let trendingMovies = await getTrendingMovies();
+    let trendingTV = await getTrendingTV()
+
+    let cardsArrayTV = await getCards(trendingTV)
+    trendingTVElement.append(...cardsArrayTV)
+
+    let cardsArrayMovie = await getCards(trendingMovies)
+    trendingMoviesElement.append(...cardsArrayMovie)
+}
+
+trending()
 
 
 // REDIRECTING TO DETAILS.HTML WITH CLICKED MOVIE
 
-movieResults.addEventListener("click", (event) => {
-    let movieContainer = event.target.closest(".movie-container")
+body.addEventListener("click", (event) => {
+    let movieCard = event.target.closest(".movie-card")
 
-    if (movieContainer) {
+    if (movieCard) {
 
-        if (movieContainer.classList.contains("tv")) {
-            window.location.href = `details.html?id=${movieContainer.id}&type=tv`
+        if (movieCard.classList.contains("tv")) {
+            window.location.href = `details.html?id=${movieCard.id}&type=tv`
         }
 
-        if (movieContainer.classList.contains("movie")) {
-            window.location.href = `details.html?id=${movieContainer.id}&type=movie`
+        if (movieCard.classList.contains("movie")) {
+            window.location.href = `details.html?id=${movieCard.id}&type=movie`
         }
     }
 })
