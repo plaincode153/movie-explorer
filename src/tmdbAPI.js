@@ -14,8 +14,13 @@ export async function getMediaDetails(mediaID, mediaType) {
     return await response.json()
 }
 
-export async function getCredits(mediaID) {
+export async function getMovieCredits(mediaID) {
     const response = await fetch(`https://api.themoviedb.org/3/movie/${mediaID}/credits?api_key=1442bd967a8ebd3b37723f20d9f1d1ec`)
+    return response.json()
+}
+
+export async function getTVCredits(mediaID) {
+    const response = await fetch(`https://api.themoviedb.org/3/tv/${mediaID}/credits?api_key=1442bd967a8ebd3b37723f20d9f1d1ec`)
     return response.json()
 }
 

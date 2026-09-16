@@ -39,6 +39,14 @@ body::before {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
+.missing-poster {
+    aspect-ratio: 2 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #232323;
+}
+
 .movie-text {
     flex: 1;
 
@@ -77,7 +85,7 @@ body::before {
     border-radius: 10px;
 }
 
-.cast-member {
+.cast-members {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
@@ -85,20 +93,20 @@ body::before {
     margin-top: 8px;
 }
 
-.cast-member > div {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-}
-
-.cast-member img {
+.cast-members img {
     width: 45px;
     height: 45px;
 
     object-fit: cover;
     border-radius: 50%;
+}
+
+/* missing cast */
+
+.missing-cast-photo {
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    background-color: rgb(31, 31, 31)
+
 }

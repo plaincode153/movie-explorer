@@ -169,6 +169,16 @@ button:hover {
     display: block;
 }
 
+.missing-poster {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #232323;
+}
+
 .movie-card p {
     margin-top: 10px;
     line-height: 1.4;

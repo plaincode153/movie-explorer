@@ -7,6 +7,7 @@ const searchInputElement = document.querySelector("#search-input")
 const movieResultsElement = document.querySelector("#movie-results")
 const trendingTVElement = document.querySelector("#trending-tv")
 const trendingMoviesElement = document.querySelector("#trending-movies")
+const messageElement = document.querySelector("#message")
 
 // SEARCH
 
@@ -22,14 +23,20 @@ const params = new URLSearchParams({
 
 searchFormElement.addEventListener("submit", function (event) {
     event.preventDefault()
-    params.set("query", `${searchInputElement.value}`)
     handleSearch()
 })
 
 async function handleSearch() {
+    params.set("query", `${searchInputElement.value}`)
     const searchResults = await getSearchResults(`${baseUrl}?${params}`)
     let cardsArray = await getCards(searchResults)
-    movieResultsElement.append(...cardsArray)
+    movieResultsElement.replaceChildren(...cardsArray)
+
+    if (cardsArray.length === 0) {
+        messageElement.textContent = "No movies or TV shows found."
+    } else {
+        messageElement.textContent = ""
+    }
 }
 
 // GET CARDS ARRAY & RENDER IN EVENT LISTENER
@@ -39,9 +46,9 @@ async function getCards(data) {
     const config = await getConfigDetails()
     let cards = []
 
-    data.results.forEach((array) => {
+    data.results.forEach((Each) => {
 
-        if (array.media_type === "person") {
+        if (Each.media_type === "person") {
             return;
         }
 
@@ -50,25 +57,35 @@ async function getCards(data) {
         let movieImageElement = document.createElement("img")
 
         // image 
-        movieImageElement.src = config.images.secure_base_url + "w185" + array.poster_path
+        if (Each.poster_path) {
+            movieImageElement.src = config.images.secure_base_url + "w185" + Each.poster_path
+        }
 
         // id + class
-        movieCardElement.setAttribute("id", array.id)
+        movieCardElement.setAttribute("id", Each.id)
         movieCardElement.classList.add("movie-card")
 
         // title + TV/MOVIE class
-        if (array.media_type === "tv") {
-            movieTitleElement.textContent = array.name;
+        if (Each.media_type === "tv") {
+            movieTitleElement.textContent = Each.name;
             movieCardElement.classList.add("tv")
         }
 
-        if (array.media_type === "movie") {
-            movieTitleElement.textContent = array.title;
+        if (Each.media_type === "movie") {
+            movieTitleElement.textContent = Each.title;
             movieCardElement.classList.add("movie")
         }
 
         movieCardElement.append(movieTitleElement);
-        movieCardElement.append(movieImageElement)
+
+        if (Each.poster_path) {
+            movieCardElement.append(movieImageElement)
+        } else {
+            const missingPosterElement = document.createElement("div")
+            missingPosterElement.classList.add("missing-poster")
+            missingPosterElement.textContent = "No poster available"
+            movieCardElement.append(missingPosterElement)
+        }
 
         cards.push(movieCardElement)
 
@@ -83,11 +100,23 @@ async function trending() {
     let trendingMovies = await getTrendingMovies();
     let trendingTV = await getTrendingTV()
 
-    let cardsArrayTV = await getCards(trendingTV)
-    trendingTVElement.append(...cardsArrayTV)
+    if (trendingTV.results.length === 0) {
+        const messageElement = document.createElement("p")
+        messageElement.textContent = "No trending TV shows available."
+        trendingTVElement.append(messageElement)
+    } else {
+        let cardsArrayTV = await getCards(trendingTV)
+        trendingTVElement.append(...cardsArrayTV)
+    }
 
-    let cardsArrayMovie = await getCards(trendingMovies)
-    trendingMoviesElement.append(...cardsArrayMovie)
+    if (trendingMovies.results.length === 0) {
+        const messageElement = document.createElement("p")
+        messageElement.textContent = "No trending movies available."
+        trendingMoviesElement.append(messageElement)
+    } else {
+        let cardsArrayMovie = await getCards(trendingMovies)
+        trendingMoviesElement.append(...cardsArrayMovie)
+    }
 }
 
 trending()
@@ -109,9 +138,6 @@ body.addEventListener("click", (event) => {
         }
     }
 })
-
-
-
 
 
 
