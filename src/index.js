@@ -4,7 +4,7 @@ import { getConfigDetails, getTrendingMovies, getTrendingTV, getSearchResults } 
 const body = document.querySelector("body")
 const searchFormElement = document.querySelector("#search-form")
 const searchInputElement = document.querySelector("#search-input")
-const movieResultsElement = document.querySelector("#movie-results")
+const mediaResultsElement = document.querySelector("#media-results")
 const trendingTVElement = document.querySelector("#trending-tv")
 const trendingMoviesElement = document.querySelector("#trending-movies")
 const messageElement = document.querySelector("#message")
@@ -28,14 +28,20 @@ searchFormElement.addEventListener("submit", function (event) {
 
 async function handleSearch() {
     params.set("query", `${searchInputElement.value}`)
-    const searchResults = await getSearchResults(`${baseUrl}?${params}`)
-    let cardsArray = await getCards(searchResults)
-    movieResultsElement.replaceChildren(...cardsArray)
+    try {
+        const searchResults = await getSearchResults(`${baseUrl}?${params}`)
+        let cardsArray = await getCards(searchResults)
+        mediaResultsElement.replaceChildren(...cardsArray)
 
-    if (cardsArray.length === 0) {
-        messageElement.textContent = "No movies or TV shows found."
-    } else {
-        messageElement.textContent = ""
+        if (cardsArray.length === 0) {
+            messageElement.textContent = "No movies or TV shows found."
+        } else {
+            messageElement.textContent = ""
+        }
+
+    } catch (error) {
+        console.error("Error fetching search results:", error)
+        messageElement.textContent = "An error occurred while fetching search results."
     }
 }
 
@@ -43,7 +49,17 @@ async function handleSearch() {
 
 async function getCards(data) {
 
-    const config = await getConfigDetails()
+    // configuration for images and backup for images
+    let baseUrl = "https://image.tmdb.org/t/p/"
+
+    try {
+        const config = await getConfigDetails()
+        baseUrl = config.images.secure_base_url;
+
+    } catch (error) {
+        console.error("Error fetching config details:", error)
+    }
+
     let cards = []
 
     data.results.forEach((Each) => {
@@ -52,42 +68,46 @@ async function getCards(data) {
             return;
         }
 
-        let movieCardElement = document.createElement("div")
-        let movieTitleElement = document.createElement("p");
-        let movieImageElement = document.createElement("img")
-
-        // image 
-        if (Each.poster_path) {
-            movieImageElement.src = config.images.secure_base_url + "w185" + Each.poster_path
-        }
+        let mediaCardElement = document.createElement("div")
 
         // id + class
-        movieCardElement.setAttribute("id", Each.id)
-        movieCardElement.classList.add("movie-card")
+        mediaCardElement.setAttribute("id", Each.id)
+        mediaCardElement.classList.add("media-card")
 
         // title + TV/MOVIE class
         if (Each.media_type === "tv") {
-            movieTitleElement.textContent = Each.name;
-            movieCardElement.classList.add("tv")
+            if (Each.name) {
+                let mediaTitleElement = document.createElement("h3")
+                mediaTitleElement.textContent = Each.name;
+                mediaCardElement.append(mediaTitleElement)
+            }
+            mediaCardElement.classList.add("tv")
         }
 
         if (Each.media_type === "movie") {
-            movieTitleElement.textContent = Each.title;
-            movieCardElement.classList.add("movie")
+            if (Each.title) {
+                let mediaTitleElement = document.createElement("h3")
+                mediaTitleElement.textContent = Each.title;
+                mediaCardElement.append(mediaTitleElement)
+            }
+            mediaCardElement.classList.add("movie")
         }
 
-        movieCardElement.append(movieTitleElement);
-
+        // poster
         if (Each.poster_path) {
-            movieCardElement.append(movieImageElement)
+            let mediaImageElement = document.createElement("img")
+            mediaImageElement.classList.add("media-poster")
+            mediaImageElement.src = baseUrl + "w185" + Each.poster_path
+
+            mediaCardElement.append(mediaImageElement)
         } else {
             const missingPosterElement = document.createElement("div")
             missingPosterElement.classList.add("missing-poster")
             missingPosterElement.textContent = "No poster available"
-            movieCardElement.append(missingPosterElement)
+            mediaCardElement.append(missingPosterElement)
         }
 
-        cards.push(movieCardElement)
+        cards.push(mediaCardElement)
 
         return;
     });
@@ -97,25 +117,40 @@ async function getCards(data) {
 // TRENDING
 
 async function trending() {
-    let trendingMovies = await getTrendingMovies();
-    let trendingTV = await getTrendingTV()
+    try {
+        let trendingTV = await getTrendingTV()
 
-    if (trendingTV.results.length === 0) {
-        const messageElement = document.createElement("p")
-        messageElement.textContent = "No trending TV shows available."
-        trendingTVElement.append(messageElement)
-    } else {
-        let cardsArrayTV = await getCards(trendingTV)
-        trendingTVElement.append(...cardsArrayTV)
+        if (trendingTV.results.length === 0) {
+            const messageElement = document.createElement("p")
+            messageElement.textContent = "No trending TV shows available."
+            trendingTVElement.append(messageElement)
+        } else {
+            let cardsArrayTV = await getCards(trendingTV)
+            trendingTVElement.append(...cardsArrayTV)
+        }
+    } catch (error) {
+        console.error("Error fetching trending TV data:", error)
+        const trendingMessageElement = document.createElement("p")
+        trendingMessageElement.textContent = "An error occurred while fetching trending TV shows."
+        trendingTVElement.append(trendingMessageElement)
     }
 
-    if (trendingMovies.results.length === 0) {
-        const messageElement = document.createElement("p")
-        messageElement.textContent = "No trending movies available."
-        trendingMoviesElement.append(messageElement)
-    } else {
-        let cardsArrayMovie = await getCards(trendingMovies)
-        trendingMoviesElement.append(...cardsArrayMovie)
+    try {
+        let trendingMovies = await getTrendingMovies();
+
+        if (trendingMovies.results.length === 0) {
+            const messageElement = document.createElement("p")
+            messageElement.textContent = "No trending movies available."
+            trendingMoviesElement.append(messageElement)
+        } else {
+            let cardsArrayMovie = await getCards(trendingMovies)
+            trendingMoviesElement.append(...cardsArrayMovie)
+        }
+    } catch (error) {
+        console.error("Error fetching trending movies data:", error)
+        const trendingMessageElement = document.createElement("p")
+        trendingMessageElement.textContent = "An error occurred while fetching trending movies."
+        trendingMoviesElement.append(trendingMessageElement)
     }
 }
 
@@ -125,16 +160,16 @@ trending()
 // REDIRECTING TO DETAILS.HTML WITH CLICKED MOVIE
 
 body.addEventListener("click", (event) => {
-    let movieCard = event.target.closest(".movie-card")
+    let mediaCard = event.target.closest(".media-card")
 
-    if (movieCard) {
+    if (mediaCard) {
 
-        if (movieCard.classList.contains("tv")) {
-            window.location.href = `details.html?id=${movieCard.id}&type=tv`
+        if (mediaCard.classList.contains("tv")) {
+            window.location.href = `details.html?id=${mediaCard.id}&type=tv`
         }
 
-        if (movieCard.classList.contains("movie")) {
-            window.location.href = `details.html?id=${movieCard.id}&type=movie`
+        if (mediaCard.classList.contains("movie")) {
+            window.location.href = `details.html?id=${mediaCard.id}&type=movie`
         }
     }
 })

@@ -105,7 +105,7 @@ button:hover {
 
 /* SEARCH RESULTS */
 
-#movie-results {
+#media-results {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 
@@ -139,7 +139,7 @@ button:hover {
 
 /* card styling */
 
-.movie-card {
+.media-card {
     flex: 0 0 220px;
 
     padding: 12px;
@@ -156,12 +156,12 @@ button:hover {
 
 }
 
-.movie-card:hover {
+.media-card:hover {
     transform: translateY(-4px);
     background: rgba(45, 45, 45, 0.95);
 }
 
-.movie-card img {
+.media-card img {
     width: 100%;
 
     border-radius: 20px;
@@ -179,7 +179,7 @@ button:hover {
     background-color: #232323;
 }
 
-.movie-card p {
+.media-card p {
     margin-top: 10px;
     line-height: 1.4;
 }
@@ -195,7 +195,7 @@ button:hover {
         flex-direction: column;
     }
 
-    .movie-card {
+    .media-card {
         padding: 10px;
     }
 }

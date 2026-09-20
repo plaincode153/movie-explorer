@@ -73,6 +73,8 @@ body::before {
     gap: 12px;
 }
 
+/* trailer styling */
+
 .trailer {
     width: 100%;
     max-width: 700px;
@@ -83,6 +85,28 @@ body::before {
 
     border: 0;
     border-radius: 10px;
+}
+
+.missing-trailer {
+    width: 100%;
+    max-width: 700px;
+    aspect-ratio: 16 / 9;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 10px;
+    padding: 20px;
+
+    background-color: #1f1f1f;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+
+    color: #d9d9d9;
+    font-size: 0.95rem;
+    text-align: center;
+    line-height: 1.5;
 }
 
 .cast-members {
@@ -110,3 +134,5 @@ body::before {
     background-color: rgb(31, 31, 31)
 
 }
+
+
