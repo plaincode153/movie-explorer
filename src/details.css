@@ -70,7 +70,28 @@ body::before {
 
 .ratings {
     display: flex;
-    gap: 12px;
+    flex-direction: column;
+    gap: 4px;
+    width: fit-content;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+}
+
+.ratings-label {
+    color: #bcbcbc;
+    font-size: 0.9rem;
+}
+
+.rating-value {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: baseline;
+}
+
+.vote-average {
+    font-weight: bold;
 }
 
 /* trailer styling */

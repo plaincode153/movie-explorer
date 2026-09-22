@@ -75,8 +75,14 @@ async function renderDetails() {
         let genres = ""
         if (data.genres?.length > 0) {
             for (let i = 0; i < data.genres.length; i++) {
-                genres += data.genres[i].name + " "
+
+                if (i > 0) { // adds a comma before each genre.
+                genres += ", "
             }
+                genres += data.genres[i].name
+            }
+            
+            
 
             genresElement.textContent = "Genres: " + genres
         } else {
@@ -87,11 +93,11 @@ async function renderDetails() {
         let voteAverage = data.vote_average;
         let voteCount = data.vote_count;
         if (voteCount > 0) {
-            voteAverageElement.textContent = voteAverage;
-            voteCountElement.textContent = voteCount;
+            voteAverageElement.textContent = voteAverage.toFixed(1) + "/10";
+            voteCountElement.textContent = "· " + voteCount.toLocaleString("en-US") + " votes";
         } else {
             voteAverageElement.textContent = "Not rated";
-            voteCountElement.textContent = "0";
+            voteCountElement.textContent = "· 0 votes";
         }
 
         // TV title, release date, seasons, episodes
