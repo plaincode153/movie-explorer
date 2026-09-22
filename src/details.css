@@ -109,30 +109,69 @@ body::before {
     line-height: 1.5;
 }
 
+/* cast */
+
 .cast-members {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
 
-    margin-top: 8px;
+    margin-top: 8px;;
+}
+
+.cast-name {
+    font-size: 1rem;
 }
 
 .cast-members img {
-    width: 45px;
-    height: 45px;
+    width: 55px;
+    height: 55px;
 
     object-fit: cover;
     border-radius: 50%;
 }
-
-/* missing cast */
 
 .missing-cast-photo {
     border-radius: 50%;
     width: 45px;
     height: 45px;
     background-color: rgb(31, 31, 31)
-
 }
 
 
+/* mobile */
+
+@media (max-width: 600px) {
+    .movie-info {
+        flex-direction: column;
+        align-items: center;
+    }
+    .trailer {
+        width: 100%
+    }
+    .cast-name {
+    font-size: 0.8rem;
+}
+}
+
+/* credits */
+
+footer {
+    width: min(1200px, 92%);
+    margin: 0 auto 2rem;
+    padding: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+
+    background: rgba(15, 15, 15, 0.75);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.tmdb-logo {
+    width: 120px;
+    height: auto;
+}

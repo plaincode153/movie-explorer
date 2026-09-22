@@ -5,6 +5,7 @@
 }
 
 body {
+    text-align: center;
     min-height: 100vh;
 
     background: #181818;
@@ -15,7 +16,6 @@ body {
 
 .site-header {
     padding: 50px 20px 30px;
-    text-align: center;
 }
 
 .site-header h1 {
@@ -37,6 +37,7 @@ main {
 /* SEARCH */
 
 .search-section {
+    text-align: left;
     margin-bottom: 50px;
 
     padding: 25px;
@@ -148,12 +149,25 @@ button:hover {
 
     border-radius: 10px;
 
+    text-align: center;
+
+
     cursor: pointer;
 
     transition:
         transform 0.2s ease,
         background 0.2s ease;
 
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.media-card:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 4px;
 }
 
 .media-card:hover {
@@ -196,6 +210,31 @@ button:hover {
     }
 
     .media-card {
-        padding: 10px;
+        flex: 0 0 160px;
+        font-size: .8rem;
+
     }
+
+}
+
+/* credits */
+
+footer {
+    width: min(1200px, 92%);
+    margin: 0 auto 2rem;
+    padding: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; 
+
+    background: rgba(15, 15, 15, 0.75);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.tmdb-logo {
+    width: 120px;
+    height: auto;
 }

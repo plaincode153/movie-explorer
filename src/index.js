@@ -11,10 +11,12 @@ const messageElement = document.querySelector("#message")
 
 // SEARCH
 
+let searchId = 0; // track the latest search ID
+
 const baseUrl = `https://api.themoviedb.org/3/search/multi`
 
 const params = new URLSearchParams({
-    api_key: "1442bd967a8ebd3b37723f20d9f1d1ec",
+    api_key: process.env.WEBPACK_TMDB_API_KEY,
     query: "",
     include_adult: false,
     language: `en-US`,
@@ -27,11 +29,21 @@ searchFormElement.addEventListener("submit", function (event) {
 })
 
 async function handleSearch() {
+
+    searchId++
+    const currentSearchId = searchId
+
     params.set("query", `${searchInputElement.value}`)
     try {
+        messageElement.textContent = "loading search..."
         const searchResults = await getSearchResults(`${baseUrl}?${params}`)
         let cardsArray = await getCards(searchResults)
-        mediaResultsElement.replaceChildren(...cardsArray)
+        messageElement.textContent = ""
+
+        if (currentSearchId !== searchId) {
+            return
+        }
+
 
         if (cardsArray.length === 0) {
             messageElement.textContent = "No movies or TV shows found."
@@ -39,7 +51,14 @@ async function handleSearch() {
             messageElement.textContent = ""
         }
 
+        mediaResultsElement.replaceChildren(...cardsArray)
+
+
     } catch (error) {
+
+        if (currentSearchId !== searchId) {
+            return
+        }
         console.error("Error fetching search results:", error)
         messageElement.textContent = "An error occurred while fetching search results."
     }
@@ -68,35 +87,37 @@ async function getCards(data) {
             return;
         }
 
-        let mediaCardElement = document.createElement("div")
-
-        // id + class
-        mediaCardElement.setAttribute("id", Each.id)
+        let mediaCardElement = document.createElement("a")
+        mediaCardElement.href = `details.html?id=${Each.id}&type=${Each.media_type}`
         mediaCardElement.classList.add("media-card")
 
-        // title + TV/MOVIE class
+
+        // title
+        let mediaName;
+
         if (Each.media_type === "tv") {
             if (Each.name) {
+                mediaName = Each.name
                 let mediaTitleElement = document.createElement("h3")
-                mediaTitleElement.textContent = Each.name;
+                mediaTitleElement.textContent = mediaName;
                 mediaCardElement.append(mediaTitleElement)
             }
-            mediaCardElement.classList.add("tv")
         }
 
         if (Each.media_type === "movie") {
             if (Each.title) {
+                mediaName = Each.title
                 let mediaTitleElement = document.createElement("h3")
-                mediaTitleElement.textContent = Each.title;
+                mediaTitleElement.textContent = mediaName;
                 mediaCardElement.append(mediaTitleElement)
             }
-            mediaCardElement.classList.add("movie")
         }
 
         // poster
         if (Each.poster_path) {
             let mediaImageElement = document.createElement("img")
             mediaImageElement.classList.add("media-poster")
+            mediaImageElement.alt = ""
             mediaImageElement.src = baseUrl + "w185" + Each.poster_path
 
             mediaCardElement.append(mediaImageElement)
@@ -116,63 +137,51 @@ async function getCards(data) {
 
 // TRENDING
 
-async function trending() {
+async function trendingTV() {
     try {
+        trendingTVElement.textContent = "loading trending shows..."
         let trendingTV = await getTrendingTV()
 
         if (trendingTV.results.length === 0) {
-            const messageElement = document.createElement("p")
-            messageElement.textContent = "No trending TV shows available."
-            trendingTVElement.append(messageElement)
+            trendingTVElement.textContent = "No trending TV shows available."
         } else {
             let cardsArrayTV = await getCards(trendingTV)
+            trendingTVElement.textContent = ""
             trendingTVElement.append(...cardsArrayTV)
         }
     } catch (error) {
         console.error("Error fetching trending TV data:", error)
-        const trendingMessageElement = document.createElement("p")
-        trendingMessageElement.textContent = "An error occurred while fetching trending TV shows."
-        trendingTVElement.append(trendingMessageElement)
+        trendingTVElement.textContent = "An error occurred while fetching trending TV shows."
     }
+}
+
+async function trendingMovies() {
 
     try {
+        trendingMoviesElement.textContent = "loading trending shows..."
         let trendingMovies = await getTrendingMovies();
 
         if (trendingMovies.results.length === 0) {
-            const messageElement = document.createElement("p")
-            messageElement.textContent = "No trending movies available."
-            trendingMoviesElement.append(messageElement)
+            trendingMoviesElement.textContent = "No trending movies available."
         } else {
             let cardsArrayMovie = await getCards(trendingMovies)
+            trendingMoviesElement.textContent = ""
             trendingMoviesElement.append(...cardsArrayMovie)
         }
     } catch (error) {
         console.error("Error fetching trending movies data:", error)
-        const trendingMessageElement = document.createElement("p")
-        trendingMessageElement.textContent = "An error occurred while fetching trending movies."
-        trendingMoviesElement.append(trendingMessageElement)
+        trendingMoviesElement.textContent = "An error occurred while fetching trending movies."
     }
 }
 
-trending()
+async function renderTrending() {
+    Promise.allSettled([
+        trendingMovies(),
+        trendingTV()
+    ])
+}
 
-
-// REDIRECTING TO DETAILS.HTML WITH CLICKED MOVIE
-
-body.addEventListener("click", (event) => {
-    let mediaCard = event.target.closest(".media-card")
-
-    if (mediaCard) {
-
-        if (mediaCard.classList.contains("tv")) {
-            window.location.href = `details.html?id=${mediaCard.id}&type=tv`
-        }
-
-        if (mediaCard.classList.contains("movie")) {
-            window.location.href = `details.html?id=${mediaCard.id}&type=movie`
-        }
-    }
-})
+renderTrending()
 
 
 

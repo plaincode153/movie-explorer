@@ -3,11 +3,12 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 
 export default {
     mode: "development",
+    dotenv: true,
     entry: {
         index: "./src/index.js",
         details: "./src/details.js",
     }, devtool: "eval-source-map",
-    
+
     output: {
         filename: "[name].js",
         path: path.resolve(import.meta.dirname, "dist"),
@@ -31,6 +32,14 @@ export default {
             {
                 test: /\.css$/i,
                 use: ["style-loader", "css-loader"],
+            },
+            {
+                test: /\.html$/i,
+                loader: "html-loader",
+            },
+            {
+                test: /\.svg$/i,
+                type: "asset/resource",
             },
         ],
     },

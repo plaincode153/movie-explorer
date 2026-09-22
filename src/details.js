@@ -10,7 +10,6 @@ const runtimeElement = document.querySelector(".runtime")
 const voteAverageElement = document.querySelector(".vote-average")
 const voteCountElement = document.querySelector(".vote-count")
 const castMembersElement = document.querySelector(".cast-members")
-const movieInfoElement = document.querySelector(".movie-info")
 const trailerElement = document.querySelector(".trailer")
 
 
@@ -26,27 +25,26 @@ import {
     getMediaDetails,
     getMovieCredits,
     getTVCredits,
-    getCastImages
 } from "./tmdbAPI.js";
 
-async function render() {
+// configuration for images and backup for images
+let baseUrl = "https://image.tmdb.org/t/p/"
 
-    // configuration for images and backup for images
-    let baseUrl = "https://image.tmdb.org/t/p/"
+try {
+    const config = await getConfigDetails()
+    baseUrl = config.images.secure_base_url;
 
-    try {
-        const config = await getConfigDetails()
-        baseUrl = config.images.secure_base_url;
+} catch (error) {
+    console.error("Error fetching config details:", error)
+}
 
-    } catch (error) {
-        console.error("Error fetching config details:", error)
-    }
 
+async function renderDetails() {
 
     try {
         const data = await getMediaDetails(mediaID, mediaType)
 
-        // backdrop image & movie poster
+        // backdrop image
         let backdrop = data.backdrop_path;
         if (backdrop) {
             body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.65)), url(${baseUrl}original${backdrop})`
@@ -54,6 +52,7 @@ async function render() {
             body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.65))`
         }
 
+        // poster
         let poster = data.poster_path
         if (poster) {
             posterElement.src = `${baseUrl}w185${poster}`
@@ -123,7 +122,7 @@ async function render() {
             } else {
                 seasonsElement.textContent += " • Episodes unavailable"
             }
-            movieInfoElement.append(seasonsElement)
+            runtimeElement.replaceWith(seasonsElement)
         }
 
         // MOVIE title, release date, runtime
@@ -168,6 +167,10 @@ async function render() {
         voteAverageElement.textContent = "N/A"
         voteCountElement.textContent = "Ratings failed to fetch."
     }
+}
+
+
+async function renderCast() {
 
     try {
         // cast information
@@ -179,50 +182,39 @@ async function render() {
             credits = await getMovieCredits(mediaID)
         }
 
+        castMembersElement.textContent = ""
+
+
         if (credits.cast?.length > 0) {
+            console.log(credits)
             for (let i = 0; i < credits.cast.length; i++) {
 
                 if (i === 10) {
                     break
                 }
 
-                let castName = credits.cast[i].name
-
                 const castMemberElement = document.createElement("div")
-                castMemberElement.classList.add("cast-person")
+                castMembersElement.append(castMemberElement)
 
+                // cast name
+                let castName = credits.cast[i].name
                 const castNameElement = document.createElement("p")
                 castNameElement.classList.add("cast-name")
-                castNameElement.textContent = `${castName}`
+                castNameElement.textContent = `${castName}` || "Unknown"
                 castMemberElement.append(castNameElement)
 
-
-                let castId = credits.cast[i].id
-
-                try {
-                    let castImages = await getCastImages(castId)
-
-                    if (castImages.profiles.length > 0) {
-
-                        let castImage = castImages.profiles[0].file_path
-
-                        const castImageElement = document.createElement("img")
-                        castImageElement.setAttribute("alt", "Cast member")
-                        castImageElement.src = baseUrl + "w92" + castImage
-                        castMemberElement.append(castImageElement)
-                    } else {
-                        const missingCastImageElement = document.createElement("div")
-                        missingCastImageElement.classList.add("missing-cast-photo")
-                        castMemberElement.append(missingCastImageElement)
-
-                    }
-                } catch (error) {
-                    console.error("Failed to fetch cast images for cast ID:", castId, error)
+                //cast image
+                if (credits.cast[i].profile_path) {
+                    const castImageElement = document.createElement("img")
+                    castImageElement.setAttribute("alt", `${castName}`)
+                    castImageElement.src = baseUrl + "w92" + credits.cast[i].profile_path
+                    castMemberElement.append(castImageElement)
+                } else {
                     const missingCastImageElement = document.createElement("div")
                     missingCastImageElement.classList.add("missing-cast-photo")
                     castMemberElement.append(missingCastImageElement)
+
                 }
-                castMembersElement.append(castMemberElement)
             }
         } else {
             const missingCastElement = document.createElement("p")
@@ -233,7 +225,10 @@ async function render() {
         console.error("Failed to fetch cast information:", error)
         castMembersElement.textContent = "Failed to fetch cast information."
     }
+}
 
+
+async function renderTrailer() {
     try {
         let trailer;
 
@@ -245,9 +240,9 @@ async function render() {
             trailer = await getMovieTrailers(mediaID)
         }
 
-        if (trailer.results?.length > 0) {
+        let trailerfound = false;
 
-            let trailerKey = trailer.results[trailer.results.length - 1].key
+        if (trailer.results?.length > 0) {
 
             for (let i = 0; i < trailer.results.length; i++) {
                 if (
@@ -255,12 +250,15 @@ async function render() {
                     trailer.results[i].site === "YouTube" &&
                     trailer.results[i].official === true
                 ) {
-                    trailerKey = trailer.results[i].key
+                    trailerElement.src = "https://www.youtube-nocookie.com/embed/" + trailer.results[i].key
+                    trailerElement.title = `Movie trailer`
+                    trailerfound = true
                     break;
                 }
             }
-            trailerElement.src = "https://www.youtube-nocookie.com/embed/" + trailerKey
-        } else {
+        }
+
+        if (!trailerfound) {
             const missingTrailerElement = document.createElement("p")
             missingTrailerElement.classList.add("missing-trailer")
             missingTrailerElement.textContent = "No trailer available."
@@ -276,5 +274,16 @@ async function render() {
 }
 
 
+async function render() {
+    await Promise.allSettled([
+        renderDetails(),
+        renderCast(),
+        renderTrailer()
+    ])
+}
 
 render()
+
+
+
+
