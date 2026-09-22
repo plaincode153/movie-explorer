@@ -4,11 +4,11 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 export default {
     mode: "development",
     dotenv: true,
+    devtool: "eval-source-map",
     entry: {
         index: "./src/index.js",
         details: "./src/details.js",
-    }, devtool: "eval-source-map",
-
+    },
     output: {
         filename: "[name].js",
         path: path.resolve(import.meta.dirname, "dist"),

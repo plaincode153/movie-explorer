@@ -38,11 +38,12 @@ async function handleSearch() {
         messageElement.textContent = "loading search..."
         const searchResults = await getSearchResults(`${baseUrl}?${params}`)
         let cardsArray = await getCards(searchResults)
-        messageElement.textContent = ""
-
+        
         if (currentSearchId !== searchId) {
             return
         }
+
+        messageElement.textContent = ""
 
 
         if (cardsArray.length === 0) {

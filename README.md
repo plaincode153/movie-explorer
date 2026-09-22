@@ -34,7 +34,7 @@ I used `createElement`, `textContent`, `append`, and `replaceChildren` to build 
 
 ### Organising the project
 
-I separated API request functions from page rendering with JavaScript modules. I configured Webpack with separate entry points and HTML templates for the home and details pages, along with loaders for CSS.
+I separated API request functions from page rendering with JavaScript modules. I configured Webpack with separate entry points and HTML templates for the home and details pages, along with loaders for CSS. I also set up separate development and production configurations and used an environment variable for the TMDB API key.
 
 ### Responsive design and accessibility
 
@@ -54,12 +54,25 @@ Install Node.js and npm, then run these commands from the project folder:
 
 ```bash
 npm install
+```
+
+Copy `.env.example` to `.env` in the project root and replace the placeholder with your own TMDB API key:
+
+```env
+WEBPACK_TMDB_API_KEY=YOUR_TMDB_API_KEY_HERE
+```
+
+Start the development server:
+
+```bash
 npm start
 ```
 
 Open the local address printed in the terminal, normally `http://localhost:8080`.
 
-The app requires an internet connection to load TMDB data and images. To use your own TMDB API key, replace the existing `api_key` values in `src/tmdbAPI.js` and `src/index.js`.
+The app requires an internet connection to load TMDB data, images, and YouTube trailers. Restart the development server after changing `.env`.
+
+This is a frontend-only portfolio project. `.env` is ignored by Git, but Webpack includes the API key in the browser bundle, so it is visible to visitors.
 
 ## Build
 
@@ -67,7 +80,17 @@ The app requires an internet connection to load TMDB data and images. To use you
 npm run build
 ```
 
-Webpack generates the site files in `dist/`. The current configuration uses development mode; production build settings are a planned improvement before deployment.
+Webpack uses `webpack.prod.js` to generate a minified production build in `dist/`. The API key must be configured before building; rebuild after changing it.
+
+To test the production build locally:
+
+```bash
+npx http-server dist
+```
+
+Open the URL printed in the terminal. Use `http-server` for this preview so the `details.html?id=...&type=...` links retain their query parameters.
+
+Publish the contents of `dist/` to a static hosting service.
 
 ## Project structure
 
@@ -80,7 +103,9 @@ src/
   details.css      Details page styles
   details.js       Details, cast, and trailer rendering
   tmdbAPI.js       API request functions
-webpack.config.js  Build and development server configuration
+webpack.dev.js     Development build and server configuration
+webpack.prod.js    Production build configuration
+.env.example       Template for the local API key configuration
 ```
 
 ## Next steps
